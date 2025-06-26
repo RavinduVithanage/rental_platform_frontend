@@ -3,7 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { ChevronDownIcon, UserIcon, LogoutIcon } from '@heroicons/react/outline';
+import {
+  ChevronDownIcon,
+  UserIcon,
+  ArrowRightOnRectangleIcon,
+} from '@heroicons/react/24/outline';
+
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -54,7 +59,7 @@ export default function Navbar() {
                     <div className="h-8 w-8 rounded-full bg-primary.DEFAULT flex items-center justify-center text-white">
                       {user && user.name ? user.name.charAt(0).toUpperCase() : ''}
                     </div>
-                    <ChevronDownIcon className="ml-1 h-5 w-5 text-gray-500" aria-hidden="true" />
+                    <ArrowRightOnRectangleIcon  className="ml-1 h-5 w-5 text-gray-500" aria-hidden="true" />
                   </Menu.Button>
                 </div>
                 <Transition
@@ -104,7 +109,7 @@ export default function Navbar() {
               <div className="flex space-x-4">
                 <Link
                   to="/login"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary.DEFAULT hover:bg-primary.dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary.DEFAULT"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-black bg-primary.DEFAULT hover:bg-primary.dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary.DEFAULT"
                 >
                   Sign in
                 </Link>
