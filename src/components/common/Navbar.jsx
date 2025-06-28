@@ -96,7 +96,6 @@ export default function Navbar() {
                           } block w-full text-left px-4 py-2 text-sm text-gray-700`}
                         >
                           <div className="flex items-center">
-                            <LogoutIcon className="h-4 w-4 mr-2" />
                             Sign out
                           </div>
                         </button>

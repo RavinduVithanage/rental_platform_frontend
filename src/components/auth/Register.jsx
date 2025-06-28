@@ -1,35 +1,52 @@
 // src/components/auth/Register.jsx
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
+
 export default function Register() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
-  const [role, setRole] = useState('client');
-  const [error, setError] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [role, setRole] = useState("client");
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+
+  const { register, error, setError } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (password !== passwordConfirmation) {
       return setError("Passwords don't match");
     }
 
     try {
-      setError('');
+      setError("");
       setLoading(true);
-      await register(name, email, password, passwordConfirmation, role);
-      navigate(role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
+
+      const result = await register(
+        name,
+        email,
+        password,
+        passwordConfirmation,
+        role
+      );
+
+      if (result.success) {
+        // Redirect based on role
+        if (result.user.roles.some((r) => r.name === "admin")) {
+          navigate("/admin/dashboard");
+        } else if (result.user.roles.some((r) => r.name === "rental_user")) {
+          navigate("/rental/dashboard");
+        } else {
+          navigate("/dashboard");
+        }
+      }
     } catch (err) {
-      setError('Failed to create an account. Please try again.');
-      console.error(err);
+      console.error("Registration error:", err);
     } finally {
       setLoading(false);
     }
@@ -42,7 +59,7 @@ export default function Register() {
           Create a new account
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Or{' '}
+          Or{" "}
           <Link
             to="/login"
             className="font-medium text-primary.DEFAULT hover:text-primary.dark"
@@ -58,7 +75,10 @@ export default function Register() {
             <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <ExclamationCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+                  <ExclamationCircleIcon
+                    className="h-5 w-5 text-red-400"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-red-700">{error}</p>
@@ -69,7 +89,10 @@ export default function Register() {
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Full name
               </label>
               <div className="mt-1">
@@ -87,7 +110,10 @@ export default function Register() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email address
               </label>
               <div className="mt-1">
@@ -105,7 +131,10 @@ export default function Register() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <div className="mt-1">
@@ -123,7 +152,10 @@ export default function Register() {
             </div>
 
             <div>
-              <label htmlFor="password-confirmation" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password-confirmation"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Confirm Password
               </label>
               <div className="mt-1">
@@ -141,7 +173,10 @@ export default function Register() {
             </div>
 
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="role"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Account Type
               </label>
               <div className="mt-1">
@@ -154,7 +189,9 @@ export default function Register() {
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary.DEFAULT focus:border-primary.DEFAULT sm:text-sm"
                 >
                   <option value="client">Tourist (Looking to rent)</option>
-                  <option value="rental_user">Rental Provider (Want to list items)</option>
+                  <option value="rental_user">
+                    Rental Provider (Want to list items)
+                  </option>
                 </select>
               </div>
             </div>
@@ -164,10 +201,10 @@ export default function Register() {
                 type="submit"
                 disabled={loading}
                 className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-primary.DEFAULT hover:bg-primary.dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary.DEFAULT ${
-                  loading ? 'opacity-70 cursor-not-allowed' : ''
+                  loading ? "opacity-70 cursor-not-allowed" : ""
                 }`}
               >
-                {loading ? 'Creating account...' : 'Create Account'}
+                {loading ? "Creating account..." : "Create Account"}
               </button>
             </div>
           </form>
@@ -178,7 +215,9 @@ export default function Register() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or sign up with</span>
+                <span className="px-2 bg-white text-gray-500">
+                  Or sign up with
+                </span>
               </div>
             </div>
 
@@ -189,7 +228,12 @@ export default function Register() {
                   className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                 >
                   <span className="sr-only">Sign up with Facebook</span>
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z"
@@ -205,7 +249,11 @@ export default function Register() {
                   className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                 >
                   <span className="sr-only">Sign up with Google</span>
-                  <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                  <svg
+                    className="w-5 h-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 48 48"
+                  >
                     <path
                       fill="#EA4335"
                       d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
