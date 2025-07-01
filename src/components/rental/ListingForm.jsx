@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import axios from "axios";
 
 export default function ListingForm({ onSubmit, onCancel, initialData }) {
   const {
@@ -20,6 +21,7 @@ export default function ListingForm({ onSubmit, onCancel, initialData }) {
 
   const [amenities, setAmenities] = useState(initialData?.amenities || []);
   const [newAmenity, setNewAmenity] = useState("");
+  const [error, setError] = useState(null);
 
   const addAmenity = () => {
     if (newAmenity.trim() && !amenities.includes(newAmenity.trim())) {
@@ -32,12 +34,18 @@ export default function ListingForm({ onSubmit, onCancel, initialData }) {
     setAmenities(amenities.filter((a) => a !== amenity));
   };
 
-  const submitHandler = (data) => {
-    onSubmit({
-      ...data,
-      amenities,
-      price: parseFloat(data.price),
-    });
+  const submitHandler = async (data) => {
+    setError(null);
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/rental-items`, {
+        ...data,
+        amenities,
+        price: parseFloat(data.price),
+      });
+      onSubmit();
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create listing");
+    }
   };
 
   return (
@@ -126,13 +134,55 @@ export default function ListingForm({ onSubmit, onCancel, initialData }) {
                 onClick={() => removeAmenity(a)}
                 className="ml-1 text-red-500"
               >
-                &times;
+                x
               </button>
             </span>
           ))}
         </div>
       </div>
-      {/* ...other fields as needed... */}
+      <div>
+        <label
+          htmlFor="location"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Location
+        </label>
+        <select
+          id="location"
+          {...register("location", { required: "Location is required" })}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+        >
+          <option value="">Select district</option>
+          <option value="Ampara">Ampara</option>
+          <option value="Anuradhapura">Anuradhapura</option>
+          <option value="Badulla">Badulla</option>
+          <option value="Batticaloa">Batticaloa</option>
+          <option value="Colombo">Colombo</option>
+          <option value="Galle">Galle</option>
+          <option value="Gampaha">Gampaha</option>
+          <option value="Hambantota">Hambantota</option>
+          <option value="Jaffna">Jaffna</option>
+          <option value="Kalutara">Kalutara</option>
+          <option value="Kandy">Kandy</option>
+          <option value="Kegalle">Kegalle</option>
+          <option value="Kilinochchi">Kilinochchi</option>
+          <option value="Kurunegala">Kurunegala</option>
+          <option value="Mannar">Mannar</option>
+          <option value="Matale">Matale</option>
+          <option value="Matara">Matara</option>
+          <option value="Monaragala">Monaragala</option>
+          <option value="Mullaitivu">Mullaitivu</option>
+          <option value="Nuwara Eliya">Nuwara Eliya</option>
+          <option value="Polonnaruwa">Polonnaruwa</option>
+          <option value="Puttalam">Puttalam</option>
+          <option value="Ratnapura">Ratnapura</option>
+          <option value="Trincomalee">Trincomalee</option>
+          <option value="Vavuniya">Vavuniya</option>
+        </select>
+        {errors.location && (
+          <p className="mt-1 text-sm text-red-600">{errors.location.message}</p>
+        )}
+      </div>
       <div className="flex justify-end space-x-3">
         <button
           type="button"
@@ -143,11 +193,12 @@ export default function ListingForm({ onSubmit, onCancel, initialData }) {
         </button>
         <button
           type="submit"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-gray-500 bg-primary hover:bg-primary-dark"
         >
           {initialData ? "Update Listing" : "Create Listing"}
         </button>
       </div>
+      {error && <div className="text-red-500">{error}</div>}
     </form>
   );
 }
