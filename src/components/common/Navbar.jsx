@@ -1,14 +1,13 @@
 // src/components/common/Navbar.jsx
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { Menu, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { Menu, Transition } from "@headlessui/react";
+import { Fragment } from "react";
 import {
   ChevronDownIcon,
   UserIcon,
   ArrowRightOnRectangleIcon,
-} from '@heroicons/react/24/outline';
-
+} from "@heroicons/react/24/outline";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -16,50 +15,59 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
     <header className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="text-xl font-bold text-primary.DEFAULT">
-                FasoRent
-              </Link>
-            </div>
-            <nav className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link
-                to="/"
-                className="border-primary.DEFAULT text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-              >
-                Home
-              </Link>
-              <Link
-                to="/about"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-              >
-                About
-              </Link>
-              <Link
-                to="/listings"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-              >
-                Listings
-              </Link>
-            </nav>
+        <div className="flex items-center justify-between h-16">
+          {/* Logo Section */}
+          <div className="flex-shrink-0 flex items-center">
+            <Link
+              to="/"
+              className="text-2xl font-extrabold text-primary.DEFAULT tracking-tight"
+            >
+              FasoRent
+            </Link>
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
+          {/* Centered Navigation */}
+          <nav className="hidden md:flex md:space-x-8 mx-auto">
+            <Link
+              to="/"
+              className="border-b-2 border-transparent hover:border-primary.DEFAULT text-gray-900 hover:text-primary.DEFAULT px-3 py-2 text-md font-medium transition"
+            >
+              Home
+            </Link>
+            <Link
+              to="/about"
+              className="border-b-2 border-transparent hover:border-primary.DEFAULT text-gray-900 hover:text-primary.DEFAULT px-3 py-2 text-md font-medium transition"
+            >
+              About
+            </Link>
+            <Link
+              to="/listings"
+              className="border-b-2 border-transparent hover:border-primary.DEFAULT text-gray-900 hover:text-primary.DEFAULT px-3 py-2 text-md font-medium transition"
+            >
+              Listings
+            </Link>
+          </nav>
+          {/* Auth/User Section */}
+          <div className="flex items-center space-x-4">
             {user ? (
-              <Menu as="div" className="ml-3 relative">
+              <Menu as="div" className="relative">
                 <div>
                   <Menu.Button className="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary.DEFAULT">
                     <span className="sr-only">Open user menu</span>
-                    <div className="h-8 w-8 rounded-full bg-primary.DEFAULT flex items-center justify-center text-white">
-                      {user && user.name ? user.name.charAt(0).toUpperCase() : ''}
+                    <div className="h-8 w-8 rounded-full bg-primary.DEFAULT flex items-center justify-center text-white font-bold">
+                      {user && user.name
+                        ? user.name.charAt(0).toUpperCase()
+                        : ""}
                     </div>
-                    <ArrowRightOnRectangleIcon  className="ml-1 h-5 w-5 text-gray-500" aria-hidden="true" />
+                    <ArrowRightOnRectangleIcon
+                      className="ml-1 h-5 w-5 text-gray-500"
+                      aria-hidden="true"
+                    />
                   </Menu.Button>
                 </div>
                 <Transition
@@ -75,9 +83,13 @@ export default function Navbar() {
                     <Menu.Item>
                       {({ active }) => (
                         <Link
-                          to={user.roles?.includes('admin') ? '/admin/dashboard' : '/user/dashboard'}
+                          to={
+                            user.roles?.includes("admin")
+                              ? "/admin/dashboard"
+                              : "/user/dashboard"
+                          }
                           className={`${
-                            active ? 'bg-gray-100' : ''
+                            active ? "bg-gray-100" : ""
                           } block px-4 py-2 text-sm text-gray-700`}
                         >
                           <div className="flex items-center">
@@ -92,12 +104,10 @@ export default function Navbar() {
                         <button
                           onClick={handleLogout}
                           className={`${
-                            active ? 'bg-gray-100' : ''
+                            active ? "bg-gray-100" : ""
                           } block w-full text-left px-4 py-2 text-sm text-gray-700`}
                         >
-                          <div className="flex items-center">
-                            Sign out
-                          </div>
+                          <div className="flex items-center">Sign out</div>
                         </button>
                       )}
                     </Menu.Item>
@@ -105,16 +115,16 @@ export default function Navbar() {
                 </Transition>
               </Menu>
             ) : (
-              <div className="flex space-x-4">
+              <div className="flex space-x-2">
                 <Link
                   to="/login"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-black bg-primary.DEFAULT hover:bg-primary.dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary.DEFAULT"
+                  className="inline-flex items-center px-4 py-2 border border-primary.DEFAULT text-sm font-medium rounded-md text-primary.DEFAULT bg-white hover:bg-primary.DEFAULT hover:text-white transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary.DEFAULT"
                 >
                   Sign in
                 </Link>
                 <Link
                   to="/register"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary.DEFAULT bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary.DEFAULT"
+                  className="inline-flex items-center px-4 py-2 border border-primary.DEFAULT text-sm font-medium rounded-md text-white bg-primary.DEFAULT hover:bg-primary.dark transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary.DEFAULT"
                 >
                   Register
                 </Link>
