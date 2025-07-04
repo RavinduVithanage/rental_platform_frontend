@@ -1,9 +1,6 @@
-// src/components/auth/Register.jsx
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
-
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -12,7 +9,6 @@ export default function Register() {
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [role, setRole] = useState("client");
   const [loading, setLoading] = useState(false);
-
   const { register, error, setError } = useAuth();
   const navigate = useNavigate();
 
@@ -26,7 +22,6 @@ export default function Register() {
     try {
       setError("");
       setLoading(true);
-
       const result = await register(
         name,
         email,
@@ -40,199 +35,227 @@ export default function Register() {
         if (result.user.roles.some((r) => r.name === "admin")) {
           navigate("/admin/dashboard");
         } else if (result.user.roles.some((r) => r.name === "rental_user")) {
-          navigate("/rental/dashboard");
+          navigate("/user/dashboard");
         } else {
           navigate("/dashboard");
         }
       }
     } catch (err) {
-      console.error("Registration error:", err);
+      setError("Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Create a new account
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Or{" "}
-          <Link
-            to="/login"
-            className="font-medium text-primary.DEFAULT hover:text-primary.dark"
-          >
-            sign in to your existing account
-          </Link>
-        </p>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background with gradient and animated elements */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-20"
+          style={{
+            backgroundImage:
+              'url("https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80")',
+          }}
+        />
+
+        {/* Floating Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          {Array.from({ length: 6 }, (_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full opacity-70 animate-pulse"
+              style={{
+                left: `${15 + i * 15}%`,
+                top: `${10 + i * 12}%`,
+                animationDelay: `${i * 0.8}s`,
+                animationDuration: `${3 + i * 0.3}s`,
+              }}
+            />
+          ))}
+        </div>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {error && (
-            <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <ExclamationCircleIcon
-                    className="h-5 w-5 text-red-400"
-                    aria-hidden="true"
-                  />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
+      {/* Main Content */}
+      <div className="relative z-10 flex flex-col justify-center py-12 sm:px-6 lg:px-8 min-h-screen">
+        {/* Header */}
+        <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-pink-500 rounded-2xl shadow-2xl mb-6 transform hover:scale-105 transition-transform duration-300">
+            <span className="text-white font-bold text-2xl">🏖️</span>
+          </div>
+
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <span className="bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent">
+              Join FasoRent
+            </span>
+          </h2>
+
+          <p className="text-xl text-gray-200 mb-4">
+            Start your Sri Lankan adventure today
+          </p>
+
+          <p className="text-gray-300">
+            Already have an account?{" "}
+            <button
+              onClick={() => alert("Navigate to login page")}
+              className="font-semibold text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text hover:from-cyan-300 hover:to-blue-400 transition-all duration-300"
+            >
+              Sign in here
+            </button>
+          </p>
+        </div>
+
+        {/* Form Container */}
+        <div className="sm:mx-auto sm:w-full sm:max-w-md px-4">
+          <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8 sm:p-10">
+            {error && (
+              <div className="mb-6 bg-red-500/20 backdrop-blur-sm border border-red-400/50 rounded-xl p-4">
+                <div className="flex items-center">
+                  <svg
+                    className="h-5 w-5 text-red-300 mr-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <p className="text-sm text-red-200">{error}</p>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Full name
-              </label>
-              <div className="mt-1">
+            <div className="space-y-6">
+              {/* Full Name */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-200">
+                  Full Name
+                </label>
                 <input
-                  id="name"
-                  name="name"
                   type="text"
-                  autoComplete="name"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary.DEFAULT focus:border-primary.DEFAULT sm:text-sm"
+                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                  placeholder="Enter your full name"
                 />
               </div>
-            </div>
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email address
-              </label>
-              <div className="mt-1">
+              {/* Email */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-200">
+                  Email Address
+                </label>
                 <input
-                  id="email"
-                  name="email"
                   type="email"
-                  autoComplete="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary.DEFAULT focus:border-primary.DEFAULT sm:text-sm"
+                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                  placeholder="Enter your email address"
                 />
               </div>
-            </div>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <div className="mt-1">
+              {/* Password */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-200">
+                  Password
+                </label>
                 <input
-                  id="password"
-                  name="password"
                   type="password"
-                  autoComplete="new-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary.DEFAULT focus:border-primary.DEFAULT sm:text-sm"
+                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                  placeholder="Create a strong password"
                 />
               </div>
-            </div>
 
-            <div>
-              <label
-                htmlFor="password-confirmation"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Confirm Password
-              </label>
-              <div className="mt-1">
+              {/* Confirm Password */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-200">
+                  Confirm Password
+                </label>
                 <input
-                  id="password-confirmation"
-                  name="password-confirmation"
                   type="password"
-                  autoComplete="new-password"
                   required
                   value={passwordConfirmation}
                   onChange={(e) => setPasswordConfirmation(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary.DEFAULT focus:border-primary.DEFAULT sm:text-sm"
+                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                  placeholder="Confirm your password"
                 />
               </div>
-            </div>
 
-            <div>
-              <label
-                htmlFor="role"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Account Type
-              </label>
-              <div className="mt-1">
+              {/* Account Type */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-200">
+                  Account Type
+                </label>
                 <select
-                  id="role"
-                  name="role"
                   required
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary.DEFAULT focus:border-primary.DEFAULT sm:text-sm"
+                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
                 >
-                  <option value="client">Tourist (Looking to rent)</option>
-                  <option value="rental_user">
-                    Rental Provider (Want to list items)
+                  <option value="client" className="bg-gray-800 text-white">
+                    🏖️ Tourist (Looking to rent)
+                  </option>
+                  <option
+                    value="rental_user"
+                    className="bg-gray-800 text-white"
+                  >
+                    🏠 Rental Provider (Want to list items)
                   </option>
                 </select>
               </div>
-            </div>
 
-            <div>
+              {/* Submit Button */}
               <button
-                type="submit"
+                onClick={handleSubmit}
                 disabled={loading}
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-primary.DEFAULT hover:bg-primary.dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary.DEFAULT ${
-                  loading ? "opacity-70 cursor-not-allowed" : ""
+                className={`w-full py-4 px-6 rounded-xl font-bold text-white shadow-2xl transform transition-all duration-300 ${
+                  loading
+                    ? "opacity-70 cursor-not-allowed bg-gray-600"
+                    : "bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 hover:scale-105 hover:shadow-orange-500/25"
                 }`}
               >
-                {loading ? "Creating account..." : "Create Account"}
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                    Creating your account...
+                  </div>
+                ) : (
+                  "🚀 Create Account"
+                )}
               </button>
             </div>
-          </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+            {/* Social Login */}
+            <div className="mt-8">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-white/20" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white/10 backdrop-blur-sm rounded-full text-gray-300">
+                    Or continue with
+                  </span>
+                </div>
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Or sign up with
-                </span>
-              </div>
-            </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <div>
+              <div className="mt-6 grid grid-cols-2 gap-4">
                 <button
                   type="button"
-                  className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  className="group flex items-center justify-center px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105"
                 >
-                  <span className="sr-only">Sign up with Facebook</span>
                   <svg
-                    className="w-5 h-5"
+                    className="w-5 h-5 text-blue-400 group-hover:text-blue-300"
                     fill="currentColor"
                     viewBox="0 0 20 20"
-                    aria-hidden="true"
                   >
                     <path
                       fillRule="evenodd"
@@ -240,18 +263,17 @@ export default function Register() {
                       clipRule="evenodd"
                     />
                   </svg>
+                  <span className="ml-2 text-sm font-medium text-gray-200 group-hover:text-white">
+                    Facebook
+                  </span>
                 </button>
-              </div>
 
-              <div>
                 <button
                   type="button"
-                  className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  className="group flex items-center justify-center px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105"
                 >
-                  <span className="sr-only">Sign up with Google</span>
                   <svg
-                    className="w-5 h-5"
-                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5 text-red-400 group-hover:text-red-300"
                     viewBox="0 0 48 48"
                   >
                     <path
@@ -270,10 +292,26 @@ export default function Register() {
                       fill="#34A853"
                       d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
                     />
-                    <path fill="none" d="M0 0h48v48H0z" />
                   </svg>
+                  <span className="ml-2 text-sm font-medium text-gray-200 group-hover:text-white">
+                    Google
+                  </span>
                 </button>
               </div>
+            </div>
+
+            {/* Footer */}
+            <div className="mt-8 text-center">
+              <p className="text-xs text-gray-400">
+                By creating an account, you agree to our{" "}
+                <button className="text-cyan-400 hover:text-cyan-300 transition-colors">
+                  Terms of Service
+                </button>{" "}
+                and{" "}
+                <button className="text-cyan-400 hover:text-cyan-300 transition-colors">
+                  Privacy Policy
+                </button>
+              </p>
             </div>
           </div>
         </div>

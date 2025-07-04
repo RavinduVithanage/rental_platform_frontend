@@ -2,7 +2,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment } from "react";
+import { Fragment, useState, useEffect } from "react";
 import {
   ChevronDownIcon,
   UserIcon,
@@ -12,6 +12,15 @@ import {
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -19,35 +28,58 @@ export default function Navbar() {
   };
 
   return (
-    <header className="bg-white shadow-sm">
+    <header
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        isScrolled
+          ? "bg-white/95 backdrop-blur-xl shadow-xl border-b border-white/20"
+          : "bg-transparent"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo Section */}
-          <div className="flex-shrink-0 flex items-center">
-            <Link
-              to="/"
-              className="text-2xl font-extrabold text-primary.DEFAULT tracking-tight"
-            >
+        <button 
+            onClick={() => handleNavClick('/')}
+            className="flex items-center space-x-2 group"
+          >
+            <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+              <span className="text-white font-bold text-xl">🏖️</span>
+            </div>
+            <span className={`text-2xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent ${
+              isScrolled ? '' : 'text-white'
+            }`}>
               FasoRent
-            </Link>
-          </div>
+            </span>
+          </button>
           {/* Centered Navigation */}
-          <nav className="hidden md:flex md:space-x-8 mx-auto">
+          <nav className="hidden md:flex items-center space-x-2">
             <Link
               to="/"
-              className="border-b-2 border-transparent hover:border-primary.DEFAULT text-gray-900 hover:text-primary.DEFAULT px-3 py-2 text-md font-medium transition"
+              className={`flex items-center space-x-1 px-4 py-2 rounded-full font-medium transition-all duration-300 ${
+                  isScrolled 
+                    ? 'text-gray-700 hover:text-orange-500 hover:bg-orange-50' 
+                    : 'text-white hover:text-orange-300 hover:bg-white/10'
+                }`}
             >
               Home
             </Link>
             <Link
               to="/about"
-              className="border-b-2 border-transparent hover:border-primary.DEFAULT text-gray-900 hover:text-primary.DEFAULT px-3 py-2 text-md font-medium transition"
+              className={`flex items-center space-x-1 px-4 py-2 rounded-full font-medium transition-all duration-300 ${
+                  isScrolled 
+                    ? 'text-gray-700 hover:text-orange-500 hover:bg-orange-50' 
+                    : 'text-white hover:text-orange-300 hover:bg-white/10'
+                }`}
             >
               About
             </Link>
             <Link
               to="/listings"
-              className="border-b-2 border-transparent hover:border-primary.DEFAULT text-gray-900 hover:text-primary.DEFAULT px-3 py-2 text-md font-medium transition"
+              className={`flex items-center space-x-1 px-4 py-2 rounded-full font-medium transition-all duration-300 ${
+                  isScrolled 
+                    ? 'text-gray-700 hover:text-orange-500 hover:bg-orange-50' 
+                    : 'text-white hover:text-orange-300 hover:bg-white/10'
+                }`}
             >
               Listings
             </Link>
