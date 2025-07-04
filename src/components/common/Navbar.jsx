@@ -133,6 +133,21 @@ export default function Navbar() {
                     </Menu.Item>
                     <Menu.Item>
                       {({ active }) => (
+                        <Link
+                          to="user/profile"
+                          className={`${
+                            active ? "bg-gray-100" : ""
+                          } block px-4 py-2 text-sm text-gray-700`}
+                        >
+                          <div className="flex items-center">
+                            <UserIcon className="h-4 w-4 mr-2" />
+                            Profile
+                          </div>
+                        </Link>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
                         <button
                           onClick={handleLogout}
                           className={`${

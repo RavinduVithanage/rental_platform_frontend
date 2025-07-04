@@ -12,6 +12,7 @@ import AdminDashboard from "./pages/Admin/Dashboard";
 import Navbar from "./components/common/Navbar";
 import Footer from "./components/common/Footer";
 import { Routes, Route } from "react-router-dom";
+import UserProfile from './pages/User/Profile';
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
               {/* Protected routes */}
               <Route element={<PrivateRoute />}>
                 <Route path="/user/dashboard" element={<UserDashboard />} />
+                <Route path="/user/profile" element={<UserProfile/>} />
               </Route>
 
               <Route element={<AdminRoute />}>
