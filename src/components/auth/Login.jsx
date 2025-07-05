@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { ExclamationCircleIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 export default function Login() {
@@ -7,7 +9,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -15,13 +18,9 @@ export default function Login() {
       setError('');
       setLoading(true);
       
-      // Simulate login process
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock successful login
-      console.log('Login successful:', { email, password });
-      alert('Login successful! (This is a demo)');
-      
+      await login(email, password);
+      navigate('/user/dashboard');
+
     } catch (err) {
       setError('Failed to log in. Please check your credentials.');
       console.error(err);
@@ -31,8 +30,7 @@ export default function Login() {
   };
 
   const handleRegisterClick = () => {
-    // This would navigate to register page in a real app
-    console.log('Navigate to register page');
+    navigate('/register');
   };
 
   const handleForgotPassword = () => {

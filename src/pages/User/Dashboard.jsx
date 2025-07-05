@@ -63,6 +63,18 @@ export default function UserDashboard() {
     { label: "Total Earnings", value: "$4,250", icon: DollarSign, color: "from-orange-500 to-red-500", change: "+12%" }
   ];
 
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    type: "",
+    category: "",
+    price: "",
+    location: "",
+    amenities: [],
+    images: [],
+  });
+  const [formError, setFormError] = useState(null);
+
   useEffect(() => {
     // Simulate API call
     const timer = setTimeout(() => {
@@ -82,12 +94,110 @@ export default function UserDashboard() {
 
   const handleEdit = (listing) => {
     setEditingListing(listing);
+    setForm({
+      title: listing.title,
+      description: listing.description || "",
+      type: listing.type || "",
+      category: listing.category,
+      price: listing.price.toString(),
+      location: listing.location,
+      amenities: listing.amenities || [],
+      images: listing.images || [listing.image],
+    });
     setShowForm(true);
   };
 
   const handleAdd = () => {
     setEditingListing(null);
+    setForm({
+      title: "",
+      description: "",
+      type: "",
+      category: "",
+      price: "",
+      location: "",
+      amenities: [],
+      images: [],
+    });
     setShowForm(true);
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    
+    if (name === 'amenities') {
+      setForm(prev => ({
+        ...prev,
+        amenities: value.split(',').map(item => item.trim()).filter(Boolean)
+      }));
+    } else {
+      setForm(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+
+  const handleFormSubmit = (e) => {
+    if (e) e.preventDefault();
+    setFormError(null);
+
+    // Basic validation
+    if (!form.title || !form.location || !form.type || !form.category || !form.price) {
+      setFormError("Please fill in all required fields");
+      return;
+    }
+
+    if (isNaN(parseFloat(form.price)) || parseFloat(form.price) <= 0) {
+      setFormError("Please enter a valid price");
+      return;
+    }
+
+    // Create new listing object
+    const newListing = {
+      id: editingListing ? editingListing.id : Date.now(),
+      title: form.title,
+      description: form.description,
+      type: form.type,
+      category: form.category,
+      price: parseFloat(form.price),
+      location: form.location,
+      amenities: form.amenities,
+      images: form.images,
+      image: form.images[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      status: "pending",
+      views: 0,
+      likes: 0,
+      bookings: 0,
+      rating: 0,
+      currency: "USD"
+    };
+
+    if (editingListing) {
+      // Update existing listing
+      setMyListings(prev => 
+        prev.map(listing => 
+          listing.id === editingListing.id ? { ...listing, ...newListing } : listing
+        )
+      );
+    } else {
+      // Add new listing
+      setMyListings(prev => [...prev, newListing]);
+    }
+
+    // Reset form and close
+    setForm({
+      title: "",
+      description: "",
+      type: "",
+      category: "",
+      price: "",
+      location: "",
+      amenities: [],
+      images: [],
+    });
+    setShowForm(false);
+    setEditingListing(null);
   };
 
   const ListingCard = ({ listing }) => (
@@ -100,7 +210,6 @@ export default function UserDashboard() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
-        {/* Status Badge */}
         <div className="absolute top-3 left-3">
           <span className={`px-3 py-1 rounded-full text-xs font-medium ${
             listing.status === 'active' 
@@ -113,7 +222,6 @@ export default function UserDashboard() {
           </span>
         </div>
 
-        {/* Action Buttons */}
         <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
             onClick={() => handleEdit(listing)}
@@ -130,7 +238,7 @@ export default function UserDashboard() {
       <div className="p-6">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-1">{listing.title}</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">{listing.title}</h3>
             <p className="text-sm text-gray-500 flex items-center">
               <MapPin size={14} className="mr-1" />
               {listing.location}
@@ -232,7 +340,6 @@ export default function UserDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 mt-16">
-      {/* Header */}
       <div className="bg-white/70 backdrop-blur-lg border-b border-white/20 relative top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
@@ -248,11 +355,11 @@ export default function UserDashboard() {
                 <Bell size={20} />
               </button>
               <button
+                className="group relative px-6 py-3 bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300 overflow-hidden"
                 onClick={handleAdd}
-                className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-medium px-6 py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
               >
-                <Plus size={20} />
-                Add Listing
+                <span className="relative z-10">✨ Create Listing</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-green-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
             </div>
           </div>
@@ -260,7 +367,6 @@ export default function UserDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {dashboardStats.map((stat, index) => (
             <div key={index} className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
@@ -278,7 +384,6 @@ export default function UserDashboard() {
           ))}
         </div>
 
-        {/* Filters and Search */}
         <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 shadow-lg mb-8">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4 w-full lg:w-auto">
@@ -330,7 +435,163 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        {/* Listings */}
+        {showForm && (
+          <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-8 shadow-xl border border-white/20 mb-8">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
+              🏠 {editingListing ? 'Edit' : 'Create New'} Listing
+            </h3>
+            
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Title *</label>
+                  <input
+                    name="title"
+                    value={form.title}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                    placeholder="Enter listing title"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Location *</label>
+                  <input
+                    name="location"
+                    value={form.location}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                    placeholder="Enter location"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={handleFormChange}
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                  placeholder="Describe your listing"
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Type *</label>
+                  <select
+                    name="type"
+                    value={form.type}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                  >
+                    <option value="">Select type</option>
+                    <option value="home">Home</option>
+                    <option value="room">Room</option>
+                    <option value="cabana">Cabana</option>
+                    <option value="hotel">Hotel</option>
+                    <option value="car">Car</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
+                  <select
+                    name="category"
+                    value={form.category}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                  >
+                    <option value="">Select category</option>
+                    <option value="vehicle">Vehicle</option>
+                    <option value="residence">Residence</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Price per day *</label>
+                  <input
+                    name="price"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.price}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                    placeholder="Enter price"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Amenities (comma separated)</label>
+                <input
+                  name="amenities"
+                  value={form.amenities.join(", ")}
+                  onChange={handleFormChange}
+                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                  placeholder="WiFi, Pool, Kitchen, etc."
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Image URLs (comma separated)</label>
+                <input
+                  name="images"
+                  type="text"
+                  value={form.images.join(", ")}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      images: e.target.value
+                        .split(",")
+                        .map((img) => img.trim())
+                        .filter(Boolean),
+                    }))
+                  }
+                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                  placeholder="Enter image URLs"
+                />
+              </div>
+              
+              {formError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl">
+                  {formError}
+                </div>
+              )}
+              
+              <div className="flex gap-4 pt-4">
+                <button
+                  type="button"
+                  onClick={handleFormSubmit}
+                  className="flex-1 bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-3 rounded-2xl hover:from-blue-500 hover:to-green-500 transition-all duration-300 transform hover:scale-105"
+                >
+                  ✨ {editingListing ? 'Update' : 'Create'} Listing
+                </button>
+                <button
+                  type="button"
+                  className="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 rounded-2xl hover:bg-gray-300 transition-all duration-300"
+                  onClick={() => {
+                    setShowForm(false);
+                    setEditingListing(null);
+                    setFormError(null);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
