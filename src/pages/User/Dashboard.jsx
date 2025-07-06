@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit3, Eye, Heart, Star, Calendar, MapPin, DollarSign, TrendingUp, Users, Settings, Bell, Search, Filter, Grid, List, MoreVertical, Trash2 } from "lucide-react";
+import api from "../../api";
 
 export default function UserDashboard() {
   const [myListings, setMyListings] = useState([]);
@@ -9,52 +10,6 @@ export default function UserDashboard() {
   const [viewMode, setViewMode] = useState('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-
-  // Mock data for demonstration
-  const mockListings = [
-    {
-      id: 1,
-      title: "Beachfront Villa in Mirissa",
-      location: "Mirissa, Southern Province",
-      price: 150,
-      currency: "USD",
-      category: "Villa",
-      status: "active",
-      views: 234,
-      likes: 18,
-      bookings: 12,
-      rating: 4.8,
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      id: 2,
-      title: "Mountain Retreat in Ella",
-      location: "Ella, Uva Province",
-      price: 85,
-      currency: "USD",
-      category: "Cottage",
-      status: "active",
-      views: 189,
-      likes: 24,
-      bookings: 8,
-      rating: 4.9,
-      image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      id: 3,
-      title: "Luxury SUV - Toyota Prado",
-      location: "Colombo, Western Province",
-      price: 65,
-      currency: "USD",
-      category: "Vehicle",
-      status: "pending",
-      views: 156,
-      likes: 15,
-      bookings: 5,
-      rating: 4.7,
-      image: "https://images.unsplash.com/photo-1562141961-d306ad2c6c1c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    }
-  ];
 
   const dashboardStats = [
     { label: "Total Listings", value: "12", icon: Grid, color: "from-blue-500 to-cyan-500", change: "+2" },
@@ -76,13 +31,19 @@ export default function UserDashboard() {
   const [formError, setFormError] = useState(null);
 
   useEffect(() => {
-    // Simulate API call
-    const timer = setTimeout(() => {
-      setMyListings(mockListings);
-      setLoading(false);
-    }, 1000);
+    const fetchMyListings = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get('/rental-items');
+        setMyListings(response.data.data.data || []);
+      } catch (error) {
+        console.error("Error fetching listings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    fetchMyListings();
   }, []);
 
   const filteredListings = myListings.filter(listing => {
@@ -138,7 +99,7 @@ export default function UserDashboard() {
     }
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     if (e) e.preventDefault();
     setFormError(null);
 
@@ -153,51 +114,38 @@ export default function UserDashboard() {
       return;
     }
 
-    // Create new listing object
-    const newListing = {
-      id: editingListing ? editingListing.id : Date.now(),
-      title: form.title,
-      description: form.description,
-      type: form.type,
-      category: form.category,
-      price: parseFloat(form.price),
-      location: form.location,
-      amenities: form.amenities,
-      images: form.images,
-      image: form.images[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      status: "pending",
-      views: 0,
-      likes: 0,
-      bookings: 0,
-      rating: 0,
-      currency: "USD"
-    };
+    try {
+      if (editingListing) {
+        // Update existing listing
+        const response = await api.put(`/rental-items/${editingListing.id}`, form);
+        setMyListings(prev =>
+          prev.map(listing =>
+            listing.id === editingListing.id ? response.data.data : listing
+          )
+        );
+      } else {
+        // Add new listing
+        const response = await api.post('/create-rental-item', form);
+        setMyListings(prev => [...prev, response.data.data]);
+      }
 
-    if (editingListing) {
-      // Update existing listing
-      setMyListings(prev => 
-        prev.map(listing => 
-          listing.id === editingListing.id ? { ...listing, ...newListing } : listing
-        )
-      );
-    } else {
-      // Add new listing
-      setMyListings(prev => [...prev, newListing]);
+      // Reset form and close
+      setForm({
+        title: "",
+        description: "",
+        type: "",
+        category: "",
+        price: "",
+        location: "",
+        amenities: [],
+        images: [],
+      });
+      setShowForm(false);
+      setEditingListing(null);
+    } catch (error) {
+      console.error("Failed to save listing:", error);
+      setFormError("Failed to save listing. Please try again.");
     }
-
-    // Reset form and close
-    setForm({
-      title: "",
-      description: "",
-      type: "",
-      category: "",
-      price: "",
-      location: "",
-      amenities: [],
-      images: [],
-    });
-    setShowForm(false);
-    setEditingListing(null);
   };
 
   const ListingCard = ({ listing }) => (

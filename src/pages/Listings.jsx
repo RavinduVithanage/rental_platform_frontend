@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import api from "../api";
 
 export default function Listings() {
   const [listings, setListings] = useState([]);
@@ -24,87 +25,16 @@ export default function Listings() {
   });
   const [formError, setFormError] = useState(null);
 
-  // Sample listings data
-  const sampleListings = [
-    {
-      id: 1,
-      title: "🏖️ Beachfront Villa in Mirissa",
-      description: "Stunning oceanfront villa with infinity pool and direct beach access. Perfect for families and groups.",
-      type: "home",
-      category: "residence",
-      price: 250,
-      location: "Mirissa",
-      amenities: ["Infinity Pool", "WiFi", "Beach Access", "Full Kitchen", "Air Conditioning"],
-      images: ["https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
-    },
-    {
-      id: 2,
-      title: "🏔️ Mountain Retreat in Kandy",
-      description: "Cozy mountain cabin surrounded by lush tea plantations with breathtaking valley views.",
-      type: "cabana",
-      category: "residence",
-      price: 120,
-      location: "Kandy",
-      amenities: ["Mountain View", "Tea Garden", "Fireplace", "Hiking Trails"],
-      images: ["https://images.unsplash.com/photo-1571115764595-644a1f56a55c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
-    },
-    {
-      id: 3,
-      title: "🚗 Luxury SUV Rental",
-      description: "Premium 4WD vehicle perfect for exploring Sri Lanka's diverse landscapes in comfort.",
-      type: "car",
-      category: "vehicle",
-      price: 80,
-      location: "Colombo",
-      amenities: ["GPS Navigation", "Air Conditioning", "Full Insurance", "4WD"],
-      images: ["https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
-    },
-    {
-      id: 4,
-      title: "🌴 Tropical Resort Room",
-      description: "Luxurious resort room with palm tree views and access to spa facilities.",
-      type: "room",
-      category: "residence",
-      price: 180,
-      location: "Bentota",
-      amenities: ["Spa Access", "Room Service", "Balcony", "Mini Bar"],
-      images: ["https://images.unsplash.com/photo-1544735716-392fe2489ffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
-    },
-    {
-      id: 5,
-      title: "🏛️ Heritage Hotel in Galle",
-      description: "Historic colonial hotel in the heart of Galle Fort with modern amenities.",
-      type: "hotel",
-      category: "residence",
-      price: 200,
-      location: "Galle",
-      amenities: ["Historic Building", "City Center", "Restaurant", "WiFi"],
-      images: ["https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
-    },
-    {
-      id: 6,
-      title: "🏍️ Motorbike Adventure",
-      description: "Explore Sri Lanka's scenic routes on this reliable motorbike rental.",
-      type: "car",
-      category: "vehicle", 
-      price: 45,
-      location: "Ella",
-      amenities: ["Helmet Included", "Route Maps", "Insurance", "24/7 Support"],
-      images: ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
-    }
-  ];
-
   useEffect(() => {
     const fetchListings = async () => {
       try {
         setLoading(true);
-        
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Filter listings based on current filters
-        let filteredListings = sampleListings;
-        
+        const response = await api.get('/rental-items');
+        console.log('API Response:', response.data); // Log the response to inspect its structure
+        // The listings array is at response.data.data.data
+        let filteredListings = Array.isArray(response.data?.data?.data) ? response.data.data.data : [];
+        console.log('Filtered Listings Before Filters:', filteredListings); // Log before applying filters
+
         if (filters.location) {
           filteredListings = filteredListings.filter(listing => 
             listing.location.toLowerCase().includes(filters.location.toLowerCase())
@@ -180,19 +110,11 @@ export default function Listings() {
     e.preventDefault();
     setFormError(null);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Add new listing to the list
-      const newListing = {
-        id: Date.now(),
-        ...form,
-        price: Number(form.price),
-        images: form.images.length > 0 ? form.images : ["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
-      };
-      
+      const response = await api.post('/rental-items', form);
+      const newListing = response.data;
       setListings(prev => [newListing, ...prev]);
-      setShowForm(false);
+      // Assuming you have a state for showing the form
+      // setShowForm(false);
       setForm({
         title: "",
         description: "",
@@ -287,7 +209,7 @@ export default function Listings() {
       <div className="bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl group-hover:shadow-2xl transition-all duration-300 h-full">
         <div className="relative overflow-hidden">
           <img
-            src={listing.images[0]}
+            src={listing.images && listing.images.length > 0 ? listing.images[0] : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"}
             alt={listing.title}
             className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
           />
@@ -344,7 +266,7 @@ export default function Listings() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
