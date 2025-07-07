@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import Input from "../../components/ui/Input";
+import Button from "../../components/ui/Button";
+import Select from "../../components/ui/Select";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -97,7 +100,7 @@ export default function Register() {
           <p className="text-gray-300">
             Already have an account?{" "}
             <button
-              onClick={() => alert("Navigate to login page")}
+              onClick={() => navigate("/login")}
               className="font-semibold text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text hover:from-cyan-300 hover:to-blue-400 transition-all duration-300"
             >
               Sign in here
@@ -135,13 +138,13 @@ export default function Register() {
                 <label className="block text-sm font-medium text-gray-200">
                   Full Name
                 </label>
-                <input
+                <Input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
                   placeholder="Enter your full name"
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-300 focus:ring-orange-500"
                 />
               </div>
 
@@ -150,13 +153,13 @@ export default function Register() {
                 <label className="block text-sm font-medium text-gray-200">
                   Email Address
                 </label>
-                <input
+                <Input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
                   placeholder="Enter your email address"
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-300 focus:ring-orange-500"
                 />
               </div>
 
@@ -165,13 +168,13 @@ export default function Register() {
                 <label className="block text-sm font-medium text-gray-200">
                   Password
                 </label>
-                <input
+                <Input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
                   placeholder="Create a strong password"
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-300 focus:ring-orange-500"
                 />
               </div>
 
@@ -180,13 +183,13 @@ export default function Register() {
                 <label className="block text-sm font-medium text-gray-200">
                   Confirm Password
                 </label>
-                <input
+                <Input
                   type="password"
                   required
                   value={passwordConfirmation}
                   onChange={(e) => setPasswordConfirmation(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
                   placeholder="Confirm your password"
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-300 focus:ring-orange-500"
                 />
               </div>
 
@@ -195,11 +198,11 @@ export default function Register() {
                 <label className="block text-sm font-medium text-gray-200">
                   Account Type
                 </label>
-                <select
+                <Select
                   required
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                  className="bg-white/10 border-white/20 text-white focus:ring-orange-500"
                 >
                   <option value="client" className="bg-gray-800 text-white">
                     🏖️ Tourist (Looking to rent)
@@ -210,17 +213,17 @@ export default function Register() {
                   >
                     🏠 Rental Provider (Want to list items)
                   </option>
-                </select>
+                </Select>
               </div>
 
               {/* Submit Button */}
-              <button
+              <Button
                 onClick={handleSubmit}
                 disabled={loading}
-                className={`w-full py-4 px-6 rounded-xl font-bold text-white shadow-2xl transform transition-all duration-300 ${
+                className={`w-full ${
                   loading
-                    ? "opacity-70 cursor-not-allowed bg-gray-600"
-                    : "bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 hover:scale-105 hover:shadow-orange-500/25"
+                    ? "opacity-70 cursor-not-allowed"
+                    : ""
                 }`}
               >
                 {loading ? (
@@ -231,7 +234,7 @@ export default function Register() {
                 ) : (
                   "🚀 Create Account"
                 )}
-              </button>
+              </Button>
             </div>
 
             {/* Social Login */}
@@ -248,9 +251,10 @@ export default function Register() {
               </div>
 
               <div className="mt-6 grid grid-cols-2 gap-4">
-                <button
+                <Button
                   type="button"
-                  className="group flex items-center justify-center px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105"
+                  variant="secondary"
+                  className="w-full inline-flex justify-center"
                 >
                   <svg
                     className="w-5 h-5 text-blue-400 group-hover:text-blue-300"
@@ -266,11 +270,12 @@ export default function Register() {
                   <span className="ml-2 text-sm font-medium text-gray-200 group-hover:text-white">
                     Facebook
                   </span>
-                </button>
+                </Button>
 
-                <button
+                <Button
                   type="button"
-                  className="group flex items-center justify-center px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105"
+                  variant="secondary"
+                  className="w-full inline-flex justify-center"
                 >
                   <svg
                     className="w-5 h-5 text-red-400 group-hover:text-red-300"
@@ -296,7 +301,7 @@ export default function Register() {
                   <span className="ml-2 text-sm font-medium text-gray-200 group-hover:text-white">
                     Google
                   </span>
-                </button>
+                </Button>
               </div>
             </div>
 

@@ -4,9 +4,10 @@ import PrivateRoute from "./components/common/PrivateRoute";
 import AdminRoute from "./components/common/AdminRoute";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import Contact from "./pages/Contact";
 import Listings from "./pages/Listings";
-import Login from "./components/auth/Login";
-import Register from "./components/auth/Register";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
 import UserDashboard from "./pages/User/Dashboard";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import Navbar from "./components/common/Navbar";
@@ -26,6 +27,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
               <Route path="/listings" element={<Listings />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
