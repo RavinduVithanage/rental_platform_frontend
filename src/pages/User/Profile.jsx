@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   User,
   Mail,
@@ -29,100 +29,226 @@ import {
   Linkedin,
   Link,
 } from "lucide-react";
+import api from "../../api";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function UserProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [saving, setSaving] = useState(false);
   const fileInputRef = useRef(null);
+  const { user, setError: setAuthError } = useAuth();
+
   const [profileData, setProfileData] = useState({
-    firstName: "Sarah",
-    lastName: "Johnson",
-    email: "sarah.johnson@email.com",
-    phone: "+94 77 123 4567",
-    location: "Colombo, Sri Lanka",
-    bio: "Passionate traveler and property enthusiast. I love sharing unique spaces and creating memorable experiences for guests from around the world.",
-    joinDate: "2022-03-15",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    languages: ["English", "Sinhala", "Tamil"],
-    verified: true,
-    superHost: true,
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    location: "",
+    bio: "",
+    joinDate: "",
+    avatar: "",
+    languages: [],
+    verified: false,
+    superHost: false,
+    notification_settings: {
+      email_notifications: true,
+      push_notifications: true,
+      sms_notifications: false,
+      marketing_emails: true,
+    },
+    two_factor_enabled: false,
   });
 
   const [tempData, setTempData] = useState(profileData);
-
-  const stats = [
+  const [stats, setStats] = useState([
     {
       label: "Total Listings",
-      value: "12",
+      value: "0",
       icon: TrendingUp,
       color: "from-blue-500 to-cyan-500",
     },
     {
       label: "Total Reviews",
-      value: "89",
+      value: "0",
       icon: Star,
       color: "from-purple-500 to-pink-500",
     },
     {
       label: "Response Rate",
-      value: "98%",
+      value: "0%",
       icon: MessageCircle,
       color: "from-green-500 to-emerald-500",
     },
     {
       label: "Profile Views",
-      value: "1.2k",
+      value: "0",
       icon: Eye,
       color: "from-orange-500 to-red-500",
     },
-  ];
+  ]);
 
-  const recentReviews = [
-    {
-      id: 1,
-      guest: "Michael Chen",
-      rating: 5,
-      comment:
-        "Amazing host! The villa was exactly as described and Sarah was very responsive.",
-      date: "2024-06-15",
-      listing: "Beachfront Villa in Mirissa",
-    },
-    {
-      id: 2,
-      guest: "Emma Wilson",
-      rating: 5,
-      comment:
-        "Beautiful mountain retreat with stunning views. Highly recommend!",
-      date: "2024-06-10",
-      listing: "Mountain Retreat in Ella",
-    },
-    {
-      id: 3,
-      guest: "David Kumar",
-      rating: 4,
-      comment:
-        "Great location and clean property. Sarah was very helpful throughout.",
-      date: "2024-06-05",
-      listing: "City Apartment in Colombo",
-    },
-  ];
+  const [recentReviews, setRecentReviews] = useState([]);
+  const [notificationSettings, setNotificationSettings] = useState({
+    email_notifications: true,
+    push_notifications: true,
+    sms_notifications: false,
+    marketing_emails: true,
+  });
 
+  // Fetch profile data on component mount
+  useEffect(() => {
+    fetchProfileData();
+    fetchUserStats();
+    fetchUserReviews();
+    fetchNotificationSettings();
+  }, []);
+
+  const fetchProfileData = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/profile");
+      if (response.data.success) {
+        const userData = response.data.data;
+        const formattedData = {
+          firstName: userData.firstName || userData.first_name || "",
+          lastName: userData.lastName || userData.last_name || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+          location: userData.location || "",
+          bio: userData.bio || "",
+          joinDate: userData.created_at || userData.joinDate || "",
+          avatar:
+            userData.avatar ||
+            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+          languages: userData.languages || [],
+          verified: userData.verified || false,
+          superHost: userData.superHost || userData.super_host || false,
+          notification_settings: userData.notification_settings || {},
+          two_factor_enabled: userData.two_factor_enabled || false,
+        };
+        setProfileData(formattedData);
+        setTempData(formattedData);
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      setError("Failed to load profile data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUserStats = async () => {
+    try {
+      const response = await api.get("/profile/stats");
+      if (response.data.success) {
+        const statsData = response.data.data;
+        setStats([
+          {
+            label: "Total Listings",
+            value: statsData.total_listings?.toString() || "0",
+            icon: TrendingUp,
+            color: "from-blue-500 to-cyan-500",
+          },
+          {
+            label: "Total Reviews",
+            value: statsData.total_reviews?.toString() || "0",
+            icon: Star,
+            color: "from-purple-500 to-pink-500",
+          },
+          {
+            label: "Response Rate",
+            value: statsData.response_rate || "0%",
+            icon: MessageCircle,
+            color: "from-green-500 to-emerald-500",
+          },
+          {
+            label: "Profile Views",
+            value: statsData.profile_views || "0",
+            icon: Eye,
+            color: "from-orange-500 to-red-500",
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
+
+  const fetchUserReviews = async () => {
+    try {
+      const response = await api.get("/profile/reviews");
+      if (response.data.success) {
+        setRecentReviews(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
+  };
+
+  const fetchNotificationSettings = async () => {
+    try {
+      const response = await api.get("/profile/notifications");
+      if (response.data.success) {
+        setNotificationSettings(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching notification settings:", error);
+    }
+  };
   const handleEdit = () => {
     setIsEditing(true);
     setTempData(profileData);
   };
 
-  const handleSave = () => {
-    setProfileData(tempData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+
+      const updateData = {
+        first_name: tempData.firstName,
+        last_name: tempData.lastName,
+        email: tempData.email,
+        phone: tempData.phone,
+        location: tempData.location,
+        bio: tempData.bio,
+        languages: tempData.languages,
+      };
+
+      const response = await api.put("/profile", updateData);
+
+      if (response.data.success) {
+        setProfileData(tempData);
+        setIsEditing(false);
+        // Show success message
+        setError(null);
+      } else {
+        setError(response.data.message || "Failed to update profile");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else if (error.response?.data?.errors) {
+        const errorMessages = Object.values(error.response.data.errors).flat();
+        setError(errorMessages[0]);
+      } else {
+        setError("Failed to update profile");
+      }
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
     setTempData(profileData);
     setIsEditing(false);
+    setError(null);
   };
   const handleInputChange = (field, value) => {
     setTempData((prev) => ({
@@ -130,53 +256,59 @@ export default function UserProfile() {
       [field]: value,
     }));
   };
-  const handleImageUpload = (event) => {
+  const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
       // Validate file type
       if (!file.type.startsWith("image/")) {
-        alert("Please select an image file");
+        setError("Please select an image file");
         return;
       }
 
-      // Validate file size (5MB limit)
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File size must be less than 5MB");
+      // Validate file size (2MB limit as per API docs)
+      if (file.size > 2 * 1024 * 1024) {
+        setError("File size must be less than 2MB");
         return;
       }
 
       setIsUploadingImage(true);
+      setError(null);
 
-      // Create a FileReader to convert the image to base64
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageDataUrl = e.target.result;
+      try {
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append("avatar", file);
 
-        // Create an image element to validate the image
-        const img = new Image();
-        img.onload = () => {
-          // Update the temp data with the new image
+        const response = await api.post("/profile/avatar", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        if (response.data.success) {
+          const newAvatarUrl = response.data.data.avatar_url;
+          // Update both temp and profile data
           setTempData((prev) => ({
             ...prev,
-            avatar: imageDataUrl,
+            avatar: newAvatarUrl,
           }));
-          setIsUploadingImage(false);
-        };
-
-        img.onerror = () => {
-          alert("Invalid image file");
-          setIsUploadingImage(false);
-        };
-
-        img.src = imageDataUrl;
-      };
-
-      reader.onerror = () => {
-        alert("Error reading file");
+          setProfileData((prev) => ({
+            ...prev,
+            avatar: newAvatarUrl,
+          }));
+        } else {
+          setError(response.data.message || "Failed to upload image");
+        }
+      } catch (error) {
+        console.error("Error uploading avatar:", error);
+        if (error.response?.data?.message) {
+          setError(error.response.data.message);
+        } else {
+          setError("Failed to upload image");
+        }
+      } finally {
         setIsUploadingImage(false);
-      };
-
-      reader.readAsDataURL(file);
+      }
     }
 
     // Reset the file input
@@ -228,6 +360,85 @@ export default function UserProfile() {
     }));
     setShowImageModal(false);
   };
+  const handleNotificationChange = async (setting, value) => {
+    try {
+      const updatedSettings = {
+        ...notificationSettings,
+        [setting]: value,
+      };
+
+      const response = await api.put("/profile/notifications", updatedSettings);
+
+      if (response.data.success) {
+        setNotificationSettings(updatedSettings);
+      } else {
+        setError("Failed to update notification settings");
+      }
+    } catch (error) {
+      console.error("Error updating notifications:", error);
+      setError("Failed to update notification settings");
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    const currentPassword = prompt("Enter your current password:");
+    if (!currentPassword) return;
+
+    const newPassword = prompt("Enter your new password:");
+    if (!newPassword) return;
+
+    const confirmPassword = prompt("Confirm your new password:");
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await api.put("/profile/password", {
+        current_password: currentPassword,
+        password: newPassword,
+        password_confirmation: confirmPassword,
+      });
+
+      if (response.data.success) {
+        alert("Password updated successfully");
+      } else {
+        setError(response.data.message || "Failed to update password");
+      }
+    } catch (error) {
+      console.error("Error updating password:", error);
+      if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("Failed to update password");
+      }
+    }
+  };
+
+  const toggle2FA = async () => {
+    try {
+      const endpoint = profileData.two_factor_enabled
+        ? "/profile/2fa/disable"
+        : "/profile/2fa/enable";
+      const response = await api.post(endpoint);
+
+      if (response.data.success) {
+        setProfileData((prev) => ({
+          ...prev,
+          two_factor_enabled: !prev.two_factor_enabled,
+        }));
+        setTempData((prev) => ({
+          ...prev,
+          two_factor_enabled: !prev.two_factor_enabled,
+        }));
+      } else {
+        setError(response.data.message || "Failed to update 2FA settings");
+      }
+    } catch (error) {
+      console.error("Error toggling 2FA:", error);
+      setError("Failed to update 2FA settings");
+    }
+  };
 
   const ProfileField = ({ label, value, field, type = "text", icon: Icon }) => (
     <div className="space-y-2">
@@ -263,6 +474,35 @@ export default function UserProfile() {
   );
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 mt-16">
+      {/* Loading State */}
+      {loading && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl">
+            <div className="flex items-center gap-4">
+              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-lg font-medium text-gray-900">
+                Loading profile...
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error Alert */}
+      {error && (
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full mx-4">
+          <div className="bg-red-500 text-white p-4 rounded-xl shadow-lg flex items-center gap-3">
+            <AlertCircle size={20} />
+            <span className="flex-1">{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="text-white hover:bg-red-600 rounded-lg p-1"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
       {/* Image Upload Modal */}
       {showImageModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -468,18 +708,30 @@ export default function UserProfile() {
 
               {/* Action Buttons */}
               <div className="flex gap-3">
+                {" "}
                 {isEditing ? (
                   <>
                     <button
                       onClick={handleSave}
-                      className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-medium px-6 py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                      disabled={saving}
+                      className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-medium px-6 py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
-                      <Save size={18} />
-                      Save Changes
+                      {saving ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save size={18} />
+                          Save Changes
+                        </>
+                      )}
                     </button>
                     <button
                       onClick={handleCancel}
-                      className="flex items-center gap-2 bg-gray-500 text-white font-medium px-6 py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                      disabled={saving}
+                      className="flex items-center gap-2 bg-gray-500 text-white font-medium px-6 py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
                       <X size={18} />
                       Cancel
@@ -651,11 +903,14 @@ export default function UserProfile() {
                   <div className="flex items-center gap-3 mb-4">
                     <Lock size={24} className="text-blue-600" />
                     <h4 className="text-lg font-semibold">Password</h4>
-                  </div>
+                  </div>{" "}
                   <p className="text-gray-600 mb-4">
                     Last changed 3 months ago
                   </p>
-                  <button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-xl hover:shadow-lg transition-all duration-300">
+                  <button
+                    onClick={handlePasswordChange}
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-xl hover:shadow-lg transition-all duration-300"
+                  >
                     Change Password
                   </button>
                 </div>
@@ -668,10 +923,21 @@ export default function UserProfile() {
                     </h4>
                   </div>
                   <p className="text-gray-600 mb-4">
-                    Add an extra layer of security
+                    {profileData.two_factor_enabled
+                      ? "Two-factor authentication is enabled"
+                      : "Add an extra layer of security"}
                   </p>
-                  <button className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-xl hover:shadow-lg transition-all duration-300">
-                    Enable 2FA
+                  <button
+                    onClick={toggle2FA}
+                    className={`px-4 py-2 rounded-xl hover:shadow-lg transition-all duration-300 text-white ${
+                      profileData.two_factor_enabled
+                        ? "bg-gradient-to-r from-red-500 to-pink-500"
+                        : "bg-gradient-to-r from-green-500 to-emerald-500"
+                    }`}
+                  >
+                    {profileData.two_factor_enabled
+                      ? "Disable 2FA"
+                      : "Enable 2FA"}
                   </button>
                 </div>
               </div>
@@ -682,23 +948,26 @@ export default function UserProfile() {
             <div className="space-y-6">
               <h3 className="text-2xl font-bold text-gray-900">
                 Notification Preferences
-              </h3>
-
+              </h3>{" "}
               <div className="space-y-4">
                 {[
                   {
+                    key: "email_notifications",
                     label: "Email notifications",
                     description: "Receive updates via email",
                   },
                   {
+                    key: "push_notifications",
                     label: "Push notifications",
                     description: "Get notified on your device",
                   },
                   {
+                    key: "sms_notifications",
                     label: "SMS notifications",
                     description: "Receive text messages for urgent updates",
                   },
                   {
+                    key: "marketing_emails",
                     label: "Marketing emails",
                     description:
                       "Get updates about new features and promotions",
@@ -719,7 +988,10 @@ export default function UserProfile() {
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
-                        defaultChecked
+                        checked={notificationSettings[item.key] || false}
+                        onChange={(e) =>
+                          handleNotificationChange(item.key, e.target.checked)
+                        }
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
