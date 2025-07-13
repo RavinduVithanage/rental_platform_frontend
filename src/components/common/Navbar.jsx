@@ -52,7 +52,7 @@ export default function Navbar() {
             ? "text-purple-600"
             : isScrolled || mobileMenuOpen
             ? "text-gray-700 hover:text-purple-600"
-            : "text-white hover:text-purple-200"
+            : "text-purple-300 hover:text-purple-500"
         }`}
       >
         {children}
@@ -79,7 +79,7 @@ export default function Navbar() {
               className={`text-2xl font-bold ${
                 isScrolled || mobileMenuOpen
                   ? "text-gray-800"
-                  : "text-white"
+                  : "text-purple-500"
               }`}
             >
               FasoRent
