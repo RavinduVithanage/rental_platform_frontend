@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   UserCircleIcon,
   Cog6ToothIcon,
@@ -11,6 +12,7 @@ import {
   XMarkIcon,
   HeartIcon,
   BuildingOffice2Icon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
@@ -47,47 +49,48 @@ export default function Navbar() {
     return (
       <Link
         to={href}
-        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 relative group ${
           isActive
-            ? "text-purple-600"
-            : isScrolled || mobileMenuOpen
-            ? "text-gray-700 hover:text-purple-600"
-            : "text-purple-300 hover:text-purple-500"
+            ? "text-violet-400 bg-violet-500/10"
+            : "text-gray-300 hover:text-violet-400 hover:bg-violet-500/10"
         }`}
       >
         {children}
+        {isActive && (
+          <motion.div
+            layoutId="activeNav"
+            className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-violet-400 rounded-full"
+          />
+        )}
       </Link>
     );
   };
 
   return (
     <header
-      className={`fixed w-full z-50 transition-all duration-300 ${
+      className={`fixed w-full z-50 transition-all duration-500 ${
         isScrolled || mobileMenuOpen
-          ? "bg-white-200 backdrop-blur-xl shadow-md"
+          ? "bg-[#0a0a0f]/95 backdrop-blur-xl shadow-lg shadow-violet-500/5 border-b border-violet-500/10"
           : "bg-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo Section */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
-              <BuildingOffice2Icon className="h-6 w-6 text-white" />
-            </div>
-            <span
-              className={`text-2xl font-bold ${
-                isScrolled || mobileMenuOpen
-                  ? "text-gray-800"
-                  : "text-purple-500"
-              }`}
+          <Link to="/" className="flex items-center space-x-3 group">
+            <motion.div 
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              className="w-11 h-11 bg-gradient-to-br from-violet-600 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/30 group-hover:shadow-violet-500/50 transition-shadow duration-300"
             >
+              <BuildingOffice2Icon className="h-6 w-6 text-white" />
+            </motion.div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
               FasoRent
             </span>
           </Link>
 
           {/* Centered Navigation (Desktop) */}
-          <nav className="hidden md:flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full shadow-inner">
+          <nav className="hidden md:flex items-center space-x-1 bg-[#16162a]/60 backdrop-blur-xl px-3 py-2 rounded-2xl border border-violet-500/10">
             {navLinks.map((link) => (
               <NavLink key={link.name} href={link.href}>
                 {link.name}
@@ -99,96 +102,99 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <Menu as="div" className="relative">
-                <Menu.Button className="flex items-center space-x-2 rounded-full p-1 pr-3 bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-colors">
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
-                    {user.name ? user.name.charAt(0).toUpperCase() : <UserCircleIcon className="h-6 w-6"/>}
+                <Menu.Button className="flex items-center space-x-2 rounded-xl p-1.5 pr-4 bg-[#16162a]/80 backdrop-blur-xl border border-violet-500/20 hover:border-violet-500/40 transition-all duration-300">
+                  <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-600 to-cyan-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-violet-500/30">
+                    {user.name ? user.name.charAt(0).toUpperCase() : <UserCircleIcon className="h-5 w-5"/>}
                   </div>
-                  <span className={`text-sm font-medium ${isScrolled ? 'text-gray-800' : 'text-white'}`}>{user.name}</span>
-                  <ChevronDownIcon className={`h-5 w-5 transition-transform ${isScrolled ? 'text-gray-800' : 'text-white'}`} />
+                  <span className="text-sm font-medium text-gray-200">{user.name}</span>
+                  <ChevronDownIcon className="h-5 w-5 text-gray-400" />
                 </Menu.Button>
                 <Transition
                   as={Fragment}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
+                  enter="transition ease-out duration-200"
+                  enterFrom="transform opacity-0 scale-95 translate-y-2"
+                  enterTo="transform opacity-100 scale-100 translate-y-0"
+                  leave="transition ease-in duration-150"
+                  leaveFrom="transform opacity-100 scale-100 translate-y-0"
+                  leaveTo="transform opacity-0 scale-95 translate-y-2"
                 >
-                  <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <Menu.Items className="origin-top-right absolute right-0 mt-3 w-64 rounded-2xl shadow-2xl shadow-violet-500/20 bg-[#16162a] border border-violet-500/20 ring-1 ring-black/5 focus:outline-none overflow-hidden">
                     <div className="p-2">
-                      <div className="p-2">
-                        <p className="text-sm font-medium text-gray-900">Signed in as</p>
-                        <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                      <div className="px-4 py-3 border-b border-violet-500/10">
+                        <p className="text-sm font-semibold text-white">Signed in as</p>
+                        <p className="text-sm text-gray-400 truncate">{user.email}</p>
                       </div>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <Link
-                            to={user.roles?.includes("admin") ? "/admin/dashboard" : "/user/dashboard"}
-                            className={`${
-                              active ? "bg-gray-100 text-purple-600" : "text-gray-700"
-                            } group flex rounded-md items-center w-full px-3 py-2 text-sm font-medium`}
-                          >
-                            <UserCircleIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-purple-500" />
-                            Dashboard
-                          </Link>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <Link
-                            to="/user/profile"
-                            className={`${
-                              active ? "bg-gray-100 text-purple-600" : "text-gray-700"
-                            } group flex rounded-md items-center w-full px-3 py-2 text-sm font-medium`}
-                          >
-                            <Cog6ToothIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-purple-500" />
-                            Profile Settings
-                          </Link>
-                        )}
-                      </Menu.Item>
-                       <Menu.Item>
-                        {({ active }) => (
-                          <Link
-                            to="/user/favorites"
-                            className={`${
-                              active ? "bg-gray-100 text-purple-600" : "text-gray-700"
-                            } group flex rounded-md items-center w-full px-3 py-2 text-sm font-medium`}
-                          >
-                            <HeartIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-purple-500" />
-                            Favorites
-                          </Link>
-                        )}
-                      </Menu.Item>
-                      <div className="border-t border-gray-100 my-1" />
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            onClick={handleLogout}
-                            className={`${
-                              active ? "bg-red-50 text-red-600" : "text-gray-700"
-                            } group flex rounded-md items-center w-full px-3 py-2 text-sm font-medium`}
-                          >
-                            <ArrowLeftOnRectangleIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-red-500" />
-                            Logout
-                          </button>
-                        )}
-                      </Menu.Item>
+                      <div className="py-2">
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              to={user.roles?.includes("admin") ? "/admin/dashboard" : "/user/dashboard"}
+                              className={`${
+                                active ? "bg-violet-500/10 text-violet-400" : "text-gray-300"
+                              } group flex rounded-xl items-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200`}
+                            >
+                              <UserCircleIcon className="mr-3 h-5 w-5 text-gray-500 group-hover:text-violet-400 transition-colors" />
+                              Dashboard
+                            </Link>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              to="/user/profile"
+                              className={`${
+                                active ? "bg-violet-500/10 text-violet-400" : "text-gray-300"
+                              } group flex rounded-xl items-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200`}
+                            >
+                              <Cog6ToothIcon className="mr-3 h-5 w-5 text-gray-500 group-hover:text-violet-400 transition-colors" />
+                              Profile Settings
+                            </Link>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              to="/user/favorites"
+                              className={`${
+                                active ? "bg-violet-500/10 text-violet-400" : "text-gray-300"
+                              } group flex rounded-xl items-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200`}
+                            >
+                              <HeartIcon className="mr-3 h-5 w-5 text-gray-500 group-hover:text-violet-400 transition-colors" />
+                              Favorites
+                            </Link>
+                          )}
+                        </Menu.Item>
+                      </div>
+                      <div className="border-t border-violet-500/10 pt-2">
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              onClick={handleLogout}
+                              className={`${
+                                active ? "bg-red-500/10 text-red-400" : "text-gray-300"
+                              } group flex rounded-xl items-center w-full px-4 py-3 text-sm font-medium transition-colors duration-200`}
+                            >
+                              <ArrowLeftOnRectangleIcon className="mr-3 h-5 w-5 text-gray-500 group-hover:text-red-400 transition-colors" />
+                              Logout
+                            </button>
+                          )}
+                        </Menu.Item>
+                      </div>
                     </div>
                   </Menu.Items>
                 </Transition>
               </Menu>
             ) : (
-              <div className="flex space-x-2">
+              <div className="flex items-center space-x-3">
                 <Link
                   to="/login"
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300 ${isScrolled ? 'text-gray-700 bg-gray-100 hover:bg-gray-200' : 'text-white bg-white/20 hover:bg-white/30'}`}
+                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-300 bg-[#16162a]/60 border border-violet-500/20 hover:border-violet-500/40 hover:text-violet-400 transition-all duration-300"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
-                  className="px-4 py-2 rounded-full text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-300"
+                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-cyan-600 hover:shadow-lg hover:shadow-violet-500/30 transition-all duration-300"
                 >
                   Register
                 </Link>
@@ -198,16 +204,17 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.95 }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`p-2 rounded-md transition-colors ${isScrolled ? 'text-gray-700 hover:bg-gray-100' : 'text-white hover:bg-white/20'}`}
+              className="p-2.5 rounded-xl text-gray-300 bg-[#16162a]/60 border border-violet-500/20 hover:border-violet-500/40 transition-all duration-300"
             >
               {mobileMenuOpen ? (
                 <XMarkIcon className="h-6 w-6" />
               ) : (
                 <Bars3Icon className="h-6 w-6" />
               )}
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
@@ -216,42 +223,69 @@ export default function Navbar() {
       <Transition
         show={mobileMenuOpen}
         as={Fragment}
-        enter="duration-200 ease-out"
-        enterFrom="opacity-0 scale-95"
-        enterTo="opacity-100 scale-100"
-        leave="duration-100 ease-in"
-        leaveFrom="opacity-100 scale-100"
-        leaveTo="opacity-0 scale-95"
+        enter="duration-300 ease-out"
+        enterFrom="opacity-0 -translate-y-4"
+        enterTo="opacity-100 translate-y-0"
+        leave="duration-200 ease-in"
+        leaveFrom="opacity-100 translate-y-0"
+        leaveTo="opacity-0 -translate-y-4"
       >
-        <div className="md:hidden" id="mobile-menu">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <div className="md:hidden bg-[#0a0a0f]/98 backdrop-blur-xl border-b border-violet-500/10" id="mobile-menu">
+          <div className="px-4 pt-4 pb-6 space-y-2">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                className={`block px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
                   location.pathname === link.href
-                    ? "bg-purple-100 text-purple-700"
-                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
+                    : "text-gray-300 hover:bg-[#16162a] hover:text-white"
                 }`}
               >
                 {link.name}
               </Link>
             ))}
-            <div className="border-t border-gray-200 pt-4 mt-4">
+            <div className="border-t border-violet-500/10 pt-4 mt-4">
               {user ? (
-                <div className="px-2 space-y-1">
-                   <Link to={user.roles?.includes("admin") ? "/admin/dashboard" : "/user/dashboard"} onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900">Dashboard</Link>
-                   <Link to="/user/profile" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900">Profile</Link>
-                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900">
+                <div className="space-y-2">
+                  <Link 
+                    to={user.roles?.includes("admin") ? "/admin/dashboard" : "/user/dashboard"} 
+                    onClick={() => setMobileMenuOpen(false)} 
+                    className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:bg-[#16162a] hover:text-white transition-all duration-200"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link 
+                    to="/user/profile" 
+                    onClick={() => setMobileMenuOpen(false)} 
+                    className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:bg-[#16162a] hover:text-white transition-all duration-200"
+                  >
+                    Profile
+                  </Link>
+                  <button 
+                    onClick={() => { handleLogout(); setMobileMenuOpen(false); }} 
+                    className="block w-full text-left px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200"
+                  >
                     Logout
                   </button>
                 </div>
               ) : (
-                <div className="px-2 space-y-2">
-                  <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center px-4 py-2 rounded-md text-base font-medium text-white bg-purple-600 hover:bg-purple-700">Sign In</Link>
-                  <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center px-4 py-2 rounded-md text-base font-medium text-purple-700 bg-purple-100 hover:bg-purple-200">Register</Link>
+                <div className="space-y-3">
+                  <Link 
+                    to="/login" 
+                    onClick={() => setMobileMenuOpen(false)} 
+                    className="block w-full text-center px-4 py-3 rounded-xl text-base font-semibold text-gray-300 bg-[#16162a] border border-violet-500/20 hover:border-violet-500/40 transition-all duration-200"
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    onClick={() => setMobileMenuOpen(false)} 
+                    className="block w-full text-center px-4 py-3 rounded-xl text-base font-semibold text-white bg-gradient-to-r from-violet-600 to-cyan-600 transition-all duration-200"
+                  >
+                    Register
+                  </Link>
                 </div>
               )}
             </div>

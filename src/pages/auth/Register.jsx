@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
-import Select from "../../components/ui/Select";
+import SearchSelect from "../../components/ui/SearchSelect";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -51,71 +52,105 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden pt-20">
+    <div className="min-h-screen relative overflow-hidden pt-20 bg-[#0a0a0f]">
       {/* Background with gradient and animated elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900">
+      <div className="absolute inset-0">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-20"
+          className="absolute inset-0 bg-cover bg-center opacity-10"
           style={{
             backgroundImage:
               'url("https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80")',
           }}
         />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0f] via-[#0d0d14] to-[#0a0a0f]"></div>
+      </div>
 
-        {/* Floating Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          {Array.from({ length: 6 }, (_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full opacity-70 animate-pulse"
-              style={{
-                left: `${15 + i * 15}%`,
-                top: `${10 + i * 12}%`,
-                animationDelay: `${i * 0.8}s`,
-                animationDuration: `${3 + i * 0.3}s`,
-              }}
-            />
-          ))}
-        </div>
+      {/* Animated gradient orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-cyan-600/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-pink-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
+
+      {/* Floating particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {Array.from({ length: 15 }, (_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-violet-400/50 rounded-full"
+            animate={{
+              y: [0, -100],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: i * 0.3,
+            }}
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${60 + Math.random() * 40}%`,
+            }}
+          />
+        ))}
       </div>
 
       {/* Main Content */}
       <div className="relative z-10 flex flex-col justify-center py-12 sm:px-6 lg:px-8 min-h-screen">
         {/* Header */}
-        <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-pink-500 rounded-2xl shadow-2xl mb-6 transform hover:scale-105 transition-transform duration-300">
+        <motion.div 
+          className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div 
+            className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-violet-600 to-cyan-600 rounded-2xl shadow-2xl shadow-violet-500/30 mb-6"
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <span className="text-white font-bold text-2xl">🏖️</span>
-          </div>
+          </motion.div>
 
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent">
               Join FasoRent
             </span>
           </h2>
 
-          <p className="text-xl text-gray-200 mb-4">
+          <p className="text-xl text-gray-400 mb-4">
             Start your Sri Lankan adventure today
           </p>
 
-          <p className="text-gray-300">
+          <p className="text-gray-500">
             Already have an account?{" "}
             <button
               onClick={() => navigate("/login")}
-              className="font-semibold text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text hover:from-cyan-300 hover:to-blue-400 transition-all duration-300"
+              className="font-semibold text-violet-400 hover:text-violet-300 transition-all duration-300"
             >
               Sign in here
             </button>
           </p>
-        </div>
+        </motion.div>
 
         {/* Form Container */}
-        <div className="sm:mx-auto sm:w-full sm:max-w-md px-4">
-          <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8 sm:p-10">
+        <motion.div 
+          className="sm:mx-auto sm:w-full sm:max-w-md px-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <div className="bg-[#16162a]/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-violet-500/20 p-8 sm:p-10">
             {error && (
-              <div className="mb-6 bg-red-500/20 backdrop-blur-sm border border-red-400/50 rounded-xl p-4">
+              <motion.div 
+                className="mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
                 <div className="flex items-center">
                   <svg
-                    className="h-5 w-5 text-red-300 mr-3"
+                    className="h-5 w-5 text-red-400 mr-3"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -127,15 +162,15 @@ export default function Register() {
                       d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  <p className="text-sm text-red-200">{error}</p>
+                  <p className="text-sm text-red-400">{error}</p>
                 </div>
-              </div>
+              </motion.div>
             )}
 
             <div className="space-y-6">
               {/* Full Name */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-200">
+                <label className="block text-sm font-medium text-gray-300">
                   Full Name
                 </label>
                 <Input
@@ -144,13 +179,13 @@ export default function Register() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your full name"
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-300 focus:ring-orange-500"
+                  className="bg-[#0a0a0f]/80 border-violet-500/20 text-white placeholder-gray-500 focus:border-violet-500 focus:ring-violet-500/20"
                 />
               </div>
 
               {/* Email */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-200">
+                <label className="block text-sm font-medium text-gray-300">
                   Email Address
                 </label>
                 <Input
@@ -159,13 +194,13 @@ export default function Register() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-300 focus:ring-orange-500"
+                  className="bg-[#0a0a0f]/80 border-violet-500/20 text-white placeholder-gray-500 focus:border-violet-500 focus:ring-violet-500/20"
                 />
               </div>
 
               {/* Password */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-200">
+                <label className="block text-sm font-medium text-gray-300">
                   Password
                 </label>
                 <Input
@@ -174,13 +209,13 @@ export default function Register() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Create a strong password"
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-300 focus:ring-orange-500"
+                  className="bg-[#0a0a0f]/80 border-violet-500/20 text-white placeholder-gray-500 focus:border-violet-500 focus:ring-violet-500/20"
                 />
               </div>
 
               {/* Confirm Password */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-200">
+                <label className="block text-sm font-medium text-gray-300">
                   Confirm Password
                 </label>
                 <Input
@@ -189,38 +224,37 @@ export default function Register() {
                   value={passwordConfirmation}
                   onChange={(e) => setPasswordConfirmation(e.target.value)}
                   placeholder="Confirm your password"
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-300 focus:ring-orange-500"
+                  className="bg-[#0a0a0f]/80 border-violet-500/20 text-white placeholder-gray-500 focus:border-violet-500 focus:ring-violet-500/20"
                 />
               </div>
 
               {/* Account Type */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-200">
-                  Account Type
-                </label>
-                <Select
-                  required
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="bg-white/10 border-white/20 text-white focus:ring-orange-500"
-                >
-                  <option value="client" className="bg-gray-800 text-white">
-                    🏖️ Tourist (Looking to rent)
-                  </option>
-                  <option
-                    value="rental_user"
-                    className="bg-gray-800 text-white"
-                  >
-                    🏠 Rental Provider (Want to list items)
-                  </option>
-                </Select>
+                <SearchSelect
+                  label="Account Type"
+                  icon="👤"
+                  options={[
+                    { value: 'client', label: '🏖️ Tourist (Looking to rent)' },
+                    { value: 'rental_user', label: '🏠 Rental Provider (Want to list items)' },
+                  ]}
+                  value={
+                    role === 'client' 
+                      ? { value: 'client', label: '🏖️ Tourist (Looking to rent)' }
+                      : { value: 'rental_user', label: '🏠 Rental Provider (Want to list items)' }
+                  }
+                  onChange={(option) => setRole(option?.value || 'client')}
+                  placeholder="Select account type..."
+                  isClearable={false}
+                />
               </div>
 
               {/* Submit Button */}
-              <Button
+              <motion.button
                 onClick={handleSubmit}
                 disabled={loading}
-                className={`w-full ${
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`w-full py-3.5 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-cyan-600 hover:shadow-lg hover:shadow-violet-500/25 transition-all duration-300 ${
                   loading
                     ? "opacity-70 cursor-not-allowed"
                     : ""
@@ -234,30 +268,31 @@ export default function Register() {
                 ) : (
                   "🚀 Create Account"
                 )}
-              </Button>
+              </motion.button>
             </div>
 
             {/* Social Login */}
             <div className="mt-8">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-white/20" />
+                  <div className="w-full border-t border-violet-500/20" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white/10 backdrop-blur-sm rounded-full text-gray-300">
+                  <span className="px-4 bg-[#16162a] rounded-full text-gray-400">
                     Or continue with
                   </span>
                 </div>
               </div>
 
               <div className="mt-6 grid grid-cols-2 gap-4">
-                <Button
+                <motion.button
                   type="button"
-                  variant="secondary"
-                  className="w-full inline-flex justify-center"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full inline-flex justify-center items-center px-4 py-3 rounded-xl bg-[#0a0a0f]/80 border border-violet-500/20 text-gray-300 hover:border-violet-500/40 hover:text-white transition-all duration-300"
                 >
                   <svg
-                    className="w-5 h-5 text-blue-400 group-hover:text-blue-300"
+                    className="w-5 h-5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -267,18 +302,19 @@ export default function Register() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span className="ml-2 text-sm font-medium text-gray-200 group-hover:text-white">
+                  <span className="ml-2 text-sm font-medium">
                     Facebook
                   </span>
-                </Button>
+                </motion.button>
 
-                <Button
+                <motion.button
                   type="button"
-                  variant="secondary"
-                  className="w-full inline-flex justify-center"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full inline-flex justify-center items-center px-4 py-3 rounded-xl bg-[#0a0a0f]/80 border border-violet-500/20 text-gray-300 hover:border-violet-500/40 hover:text-white transition-all duration-300"
                 >
                   <svg
-                    className="w-5 h-5 text-red-400 group-hover:text-red-300"
+                    className="w-5 h-5"
                     viewBox="0 0 48 48"
                   >
                     <path
@@ -298,28 +334,28 @@ export default function Register() {
                       d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
                     />
                   </svg>
-                  <span className="ml-2 text-sm font-medium text-gray-200 group-hover:text-white">
+                  <span className="ml-2 text-sm font-medium">
                     Google
                   </span>
-                </Button>
+                </motion.button>
               </div>
             </div>
 
             {/* Footer */}
             <div className="mt-8 text-center">
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-500">
                 By creating an account, you agree to our{" "}
-                <button className="text-cyan-400 hover:text-cyan-300 transition-colors">
+                <button className="text-violet-400 hover:text-violet-300 transition-colors">
                   Terms of Service
                 </button>{" "}
                 and{" "}
-                <button className="text-cyan-400 hover:text-cyan-300 transition-colors">
+                <button className="text-violet-400 hover:text-violet-300 transition-colors">
                   Privacy Policy
                 </button>
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
